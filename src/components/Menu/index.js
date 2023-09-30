@@ -9,7 +9,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import styles from "./index.module.css";
 import cx from "classnames";
-import { menuItemClick } from "@/slice/menuSlice";
+import { actionMenuItemClick, menuItemClick } from "@/slice/menuSlice";
 import { MENU_ITEMS } from "@/constants";
 
 const Menu = () => {
@@ -17,6 +17,9 @@ const Menu = () => {
   const activeMenuItem = useSelector((store) => store.menu.activeMenuItem);
   const handleMenuclick = (item) => {
     dispatch(menuItemClick(item));
+  };
+  const handleActionItemClick = (item) => {
+    dispatch(actionMenuItemClick(item));
   };
   return (
     <div className={styles.menuContainer}>
@@ -36,13 +39,22 @@ const Menu = () => {
       >
         <FontAwesomeIcon icon={faEraser} className={styles.icon} />
       </div>
-      <div className={styles.iconWrapper}>
+      <div
+        className={styles.iconWrapper}
+        onClick={() => handleActionItemClick(MENU_ITEMS.UNDO)}
+      >
         <FontAwesomeIcon icon={faRotateLeft} className={styles.icon} />
       </div>
-      <div className={styles.iconWrapper}>
+      <div
+        className={styles.iconWrapper}
+        onClick={() => handleActionItemClick(MENU_ITEMS.REDO)}
+      >
         <FontAwesomeIcon icon={faRotateRight} className={styles.icon} />
       </div>
-      <div className={styles.iconWrapper}>
+      <div
+        className={styles.iconWrapper}
+        onClick={() => handleActionItemClick(MENU_ITEMS.DOWNLOAD)}
+      >
         <FontAwesomeIcon icon={faFileArrowDown} className={styles.icon} />
       </div>
     </div>
