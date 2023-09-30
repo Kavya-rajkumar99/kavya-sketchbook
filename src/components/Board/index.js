@@ -9,18 +9,36 @@ const Board = () => {
   const { color, size } = useSelector((store) => store.toolbox[activeMenuItem]);
   const canvasRef = useRef(null);
   const shouldDraw = useRef(false);
+  const drawHistory = useRef([]);
+  const historyPointer = useRef(0);
 
   useEffect(() => {
     if (!canvasRef.current) return;
     const canvas = canvasRef.current;
+    const context = canvas.getContext("2d");
     if (actionMenuItem === MENU_ITEMS.DOWNLOAD) {
       const URL = canvas.toDataURL();
       const anchorEl = document.createElement("a");
       anchorEl.href = URL;
       anchorEl.download = "sketch.png";
       anchorEl.click();
-      dispatch(actionMenuItemClick(null));
+    } else if (
+      actionMenuItem === MENU_ITEMS.UNDO ||
+      actionMenuItem === MENU_ITEMS.REDO
+    ) {
+      if (historyPointer.current > 0 && actionMenuItem === MENU_ITEMS.UNDO) {
+        historyPointer.current--;
+        context.putImageData(drawHistory.current[historyPointer.current], 0, 0);
+      }
+      if (
+        historyPointer.current < drawHistory.current.length - 1 &&
+        actionMenuItem === MENU_ITEMS.REDO
+      ) {
+        historyPointer.current++;
+        context.putImageData(drawHistory.current[historyPointer.current], 0, 0);
+      }
     }
+    dispatch(actionMenuItemClick(null));
   }, [actionMenuItem, dispatch]);
 
   useEffect(() => {
@@ -59,6 +77,9 @@ const Board = () => {
     };
     const handleMouseUp = () => {
       shouldDraw.current = false;
+      const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+      drawHistory.current.push(imageData);
+      historyPointer.current = drawHistory.current.length - 1;
     };
 
     canvas.addEventListener("mousedown", handleMouseDown);
